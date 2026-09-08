@@ -54,6 +54,7 @@ function getLtp(payload: unknown, symbol: string) {
 }
 
 export async function GET() {
+  if (process.env.ENABLE_PRIVATE_GROWW !== "true") return Response.json({ connected: false, error: "Live account access is disabled on this public demo." }, { status: 403 });
   try {
     const apiKey = process.env.GROWW_API_KEY;
     const secret = process.env.GROWW_API_SECRET;

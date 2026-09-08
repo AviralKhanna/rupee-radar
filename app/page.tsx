@@ -107,8 +107,8 @@ export default function Home() {
   const [range, setRange] = useState("1D");
   const [query, setQuery] = useState("");
   const [imported, setImported] = useState(false);
-  const [connection, setConnection] = useState<"connecting" | "live" | "error">("connecting");
-  const [connectionMessage, setConnectionMessage] = useState("Connecting to Groww…");
+  const [connection, setConnection] = useState<"connecting" | "live" | "error">("error");
+  const [connectionMessage, setConnectionMessage] = useState("Sample portfolio · illustrative prices");
 
   useEffect(() => {
     let active = true;
@@ -127,6 +127,7 @@ export default function Home() {
         setConnectionMessage(error instanceof Error ? error.message : "Groww connection failed");
       }
     };
+    if (process.env.NEXT_PUBLIC_ENABLE_GROWW !== "true") return;
     loadGroww();
     const refresh = window.setInterval(loadGroww, 15_000);
     return () => { active = false; window.clearInterval(refresh); };
@@ -177,7 +178,7 @@ export default function Home() {
 
       <section className="shell">
         <div className="welcome-row">
-          <div><p className="eyebrow">PORTFOLIO OVERVIEW</p><h1>Good morning, Aviral.</h1><p className="muted">Here’s how your investments are moving today.</p></div>
+          <div><p className="eyebrow">PORTFOLIO OVERVIEW</p><h1>Your portfolio, at a glance.</h1><p className="muted">Here’s how your investments are moving today.</p></div>
           <div className="actions"><span className={`connection ${connection}`}><i />{connectionMessage}</span><label className="import-button">↑ Import Groww CSV<input type="file" accept=".csv,text/csv" onChange={importFile} /></label></div>
         </div>
 
@@ -185,7 +186,7 @@ export default function Home() {
 
         <section className="hero-card">
           <div className="hero-copy">
-            <p className="label">Current value <span className="live-dot">LIVE</span></p>
+            <p className="label">Current value <span className="live-dot">{imported ? "IMPORTED" : connection === "live" ? "LIVE" : "DEMO"}</span></p>
             <h2>{money(totals.current)}</h2>
             <p className={totals.gain >= 0 ? "positive" : "negative"}>{totals.gain >= 0 ? "▲" : "▼"} {money(Math.abs(totals.gain))} <span>({((totals.gain / totals.invested) * 100 || 0).toFixed(2)}%) all time</span></p>
             <div className="stats"><div><span>Invested</span><strong>{money(totals.invested)}</strong></div><div><span>Today’s returns</span><strong className="positive">+₹1,248 <small>0.78%</small></strong></div></div>
